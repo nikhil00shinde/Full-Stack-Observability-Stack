@@ -55,3 +55,29 @@ tsconfig.json - Typescript configuration, tells typescript what to do, how to do
 | COPY | Build | Copy files from host to image |
 | RUN | Build | Execute a command, creates a layer (can have amny) |
 | CMD | Runtime | Start the app when container runs (only one allowed) |
+
+#### Why all three? 
+- Metrics tell you: error rate on /checkout spiked to 80% at 3:42pm
+- Logs tell you: payment-service threw TimeoutException at 3:42pm
+- Traces tell you: the timeout happened inside db.query() called by payment-service, taking 7800ms
+Together: you know WHAT broke, WHY it broke, and WHERE in the call chain it broke
+
+## Trace ID, Spans & Distributed Tracing
+The problem with Logs Alone
+- In distributed system, a single request touches multiple services. Each logs independently. With 1000 concurrent requests, logs are completely interleaved - we connont tell which log file belongs to which request.
+
+
+| Concept | What it is | Analogy |
+| --- | --- | --- |
+| TraceID | Unique ID per request, generated at entry point, passed to every service | FedEx Tracking number |
+| Span | One single operation within the trace (e.g., auth-service.verify) | One warehouse stop |
+| Parent Span | The caller operation (/checkout) | The origin warehouse |
+| Child span | A downstream operation called by the parent | Easy delivery stop |
+
+
+***Why not user_id or session_id?***
+- user_id: one user can have many concurrent requests — cannot distinguish them
+- session_id: one session spans many requests — too broad
+- Trace ID: unique per single request lifecycle — born at entry, dies at response
+
+Grafana separates visualization from storage so each component can be replaced, scaled, or upgraded independently. This follows the separation of concerns principle — Prometheus focuses on efficient time-series storage, Grafana focuses on rendering. You can swap either without affecting the other."

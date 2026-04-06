@@ -32,7 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const delay = (ms : number) => new Promise(res => setTimeout(res,ms));
-app.get('/', (req : Request, res: Response) => {
+app.get('/', (_req : Request, res: Response) => {
   activeConnections.inc();
   const end = requestDuration.startTimer({route: '/'});
   const status = {
