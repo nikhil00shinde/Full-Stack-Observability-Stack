@@ -16,6 +16,16 @@ services:
     networks:
       - observe
 
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3001:3000 
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    networks:
+      - observe
 
 networks:
   observe:
